@@ -2,6 +2,7 @@
   "name": "whatsapp",
   "version": "0.1.0",
   "private": true,
+  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,9 +14,16 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.6",
     "@mui/material": "^5.15.6",
+    "@mui/material-next": "^6.0.0-alpha.119",
+    "email-validator": "^2.0.4",
+    "firebase": "^10.7.2",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-firebase-hooks": "^5.1.1",
     "styled-components": "^6.1.8"
+  },
+  "devDependencies": {
+    "babel-plugin-styled-components": "^2.1.4"
   }
 }

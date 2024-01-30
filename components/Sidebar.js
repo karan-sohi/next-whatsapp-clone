@@ -4,14 +4,38 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { AccountCircle } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import * as EmailValidator from "email-validator";
+import {auth} from "../firebase"
 
 function Sidebar() {
+  const createChat = () => {
+    const input = prompt("Please enter your email address");
+    if (!input) return null;
+
+    if (EmailValidator.validate(input)) {
+      // We need to add the chat into DB 'chat' collection
+    }
+  };
+
   return (
     <Container>
       <Header>
-        <UserAvatar />
+        <UserAvatar
+          onClick={() => {
+            console.log(auth)
+            auth
+              .signOut()
+              
+              .then(() => {
+                console.log("Signed out");
+              })
+              .catch((error) => {
+                console.log(error);
+              })
+          }}
+        />
         <IconsContainer>
           <IconButton>
             <ChatBubbleIcon />
@@ -26,6 +50,8 @@ function Sidebar() {
         <SearchIcon />
         <SearchInput placeholder="Search in Chats"></SearchInput>
       </Search>
+
+      <SidebarButton onClick={createChat}>START A NEW CHAT</SidebarButton>
     </Container>
   );
 }
@@ -33,6 +59,19 @@ function Sidebar() {
 export default Sidebar;
 
 const Container = styled.div``;
+
+const SidebarButton = styled(Button)`
+  width: 100%;
+  color: black;
+  :hover {
+    background-color: red;
+  }
+
+  &&& {
+    border-top: 1px solid whitesmoke;
+    border-bottom: 1px solid whitesmoke;
+  }
+`;
 
 const Search = styled.div`
   display: flex;
@@ -44,7 +83,7 @@ const Search = styled.div`
 `;
 
 const SearchInput = styled.input`
-outline-width: 0;
+  outline-width: 0;
   border: none;
   flex: 1;
 `;

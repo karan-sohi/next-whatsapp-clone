@@ -4,9 +4,10 @@ import Sidebar from "@/components/Sidebar";
 
 export default function Home() {
   return (
-      <div>
+      <div> 
       <Head>
         <title>WhatsApp</title>
+        {console.log("Hello")}
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Sidebar></Sidebar>
