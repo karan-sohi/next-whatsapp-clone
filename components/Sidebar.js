@@ -7,33 +7,44 @@ import { AccountCircle } from "@mui/icons-material";
 import { Button, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import * as EmailValidator from "email-validator";
-import {auth} from "../firebase"
+import { auth, db } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
 
 function Sidebar() {
+  const [user] = useAuthState(auth);
+
+  const userChatRef = db.collection("chats");
+
+  const [chatSnapShot] = useCollection(userChatRef);
+
   const createChat = () => {
-    const input = prompt("Please enter your email address");
+    const input = prompt(
+      "Please enter an email address for the user you wish to chat with"
+    );
     if (!input) return null;
 
-    if (EmailValidator.validate(input)) {
+    if (EmailValidator.validate(input) && !chatAlreadyExists(input) && input !== user.email) {
       // We need to add the chat into DB 'chat' collection
+      db.collection("chats").add({
+        users: [user.email, input],
+      });
     }
   };
+
+  const chatAlreadyExists = (recipientEmail) =>
+    !!chatSnapShot?.docs.find(
+      (chat) =>
+        chat.data().users.find((user) => user === recipientEmail)?.length > 0
+    );
 
   return (
     <Container>
       <Header>
         <UserAvatar
           onClick={() => {
-            console.log(auth)
-            auth
-              .signOut()
-              
-              .then(() => {
-                console.log("Signed out");
-              })
-              .catch((error) => {
-                console.log(error);
-              })
+            console.log(auth);
+            auth.signOut();
           }}
         />
         <IconsContainer>
