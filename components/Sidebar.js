@@ -10,6 +10,7 @@ import * as EmailValidator from "email-validator";
 import { auth, db } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
+import Chat from "./Chat";
 
 function Sidebar() {
   const [user] = useAuthState(auth);
@@ -24,7 +25,11 @@ function Sidebar() {
     );
     if (!input) return null;
 
-    if (EmailValidator.validate(input) && !chatAlreadyExists(input) && input !== user.email) {
+    if (
+      EmailValidator.validate(input) &&
+      !chatAlreadyExists(input) &&
+      input !== user.email
+    ) {
       // We need to add the chat into DB 'chat' collection
       db.collection("chats").add({
         users: [user.email, input],
@@ -41,9 +46,8 @@ function Sidebar() {
   return (
     <Container>
       <Header>
-        <UserAvatar
+        <UserAvatar src={user?.photoURL}
           onClick={() => {
-            console.log(auth);
             auth.signOut();
           }}
         />
@@ -63,6 +67,10 @@ function Sidebar() {
       </Search>
 
       <SidebarButton onClick={createChat}>START A NEW CHAT</SidebarButton>
+
+      {chatSnapShot?.docs.map((chat) => {
+        return <Chat key={chat.id} id={chat.id} users={chat.data().users}></Chat>
+})}
     </Container>
   );
 }
