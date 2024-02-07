@@ -4,3 +4,4 @@ const getRecipientEmail = (user, users) => {
 };
 
 export default getRecipientEmail;
+    
