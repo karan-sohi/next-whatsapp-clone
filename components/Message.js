@@ -8,16 +8,14 @@ function Message({ user, message }) {
   const [userLoggedIn] = useAuthState(auth);
 
   const TypeOfMessage = user == userLoggedIn ? Receiver : Sender;
-  console.log(user);
-  console.log(message);
 
   return (
     <Container>
       <TypeOfMessage>
         {message.message}{" "}
         <Timestamp>
-        {message.timestamp
-          ? moment(message.timestamp.toDate()).format("LT")
+        {message?.timestamp
+          ? moment(message?.timestamp).format("LT")
           : "..."}
         </Timestamp>
       </TypeOfMessage>

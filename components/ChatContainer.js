@@ -17,6 +17,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import getRecipientEmail from "@/utils/getRecipientEmail";
 
 function ChatContainer({ chat, messages }) {
+  console.log(JSON.parse(messages))
   const router = useRouter();
   const params = useParams();
   const [user] = useAuthState(auth);
@@ -62,13 +63,13 @@ function ChatContainer({ chat, messages }) {
   };
 
   const showMessages = () => {
-    return messageSnapShot?.docs.map((message) => {
-      console.log(message.data());
+    
+    return JSON.parse(messages).map((message) => {
       return (
         <Message
           key={message.id}
-          user={message.data().user}
-          message={message.data()}
+          user={message.user}
+          message={message}
         ></Message>
       );
     });
@@ -163,7 +164,7 @@ const MessageContainer = styled.div`
 `;
 
 const EndOfMessage = styled.div`
-  margin-bottom: 50px;
+  margin-bottom: 200px;
 `;
 const InputContainer = styled.form`
   display: flex;
