@@ -11,6 +11,7 @@ import { auth, db } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Chat from "./Chat";
+import {GetServerSideProps } from 'next'
 
 function Sidebar() {
   const [user] = useAuthState(auth);
@@ -48,7 +49,7 @@ function Sidebar() {
       <Header>
         <UserAvatar src={user?.photoURL}
           onClick={() => {
-            auth.signOut();
+            auth.signOut(); 
           }}
         />
         <IconsContainer>
@@ -67,7 +68,7 @@ function Sidebar() {
       </Search>
 
       <SidebarButton onClick={createChat}>START A NEW CHAT</SidebarButton>
-
+            
       {chatSnapShot?.docs.map((chat) => {
         return <Chat key={chat.id} id={chat.id} users={chat.data().users}></Chat>
 })}
@@ -78,12 +79,13 @@ function Sidebar() {
 export default Sidebar;
 
 const Container = styled.div`
+color: black; 
 flex: 0.45;
 border-right: 1px solid whitesmoke;
 height: 100vh;
 min-width: 300px;
 max-width: 350px;
-overflow-y: scroll;
+overflow-y: scroll; 
 ::-webkit-scrollbar {
   display: none;
 }

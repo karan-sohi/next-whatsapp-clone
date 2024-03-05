@@ -6,40 +6,93 @@ import { Avatar } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import MicIcon from '@mui/icons-material/Mic';
-import { useState } from "react";
-import { useParams } from 'next/navigation'
-import { useRouter } from 'next/navigation'
-import firebase from 'firebase/compat/app';
+import MicIcon from "@mui/icons-material/Mic";
+import { useState, useRef } from "react";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import firebase from "firebase/compat/app";
+import TimeAgo from "timeago-react";
+import Message from "./Message";
+import { useCollection } from "react-firebase-hooks/firestore";
+import getRecipientEmail from "@/utils/getRecipientEmail";
 
-
-function ChatContainer() {
+function ChatContainer({ chat, messages }) {
   const router = useRouter();
-  const params = useParams()  
+  const params = useParams();
   const [user] = useAuthState(auth);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+  const recipientEmail = getRecipientEmail(user, chat.users);
+  const endMessageRef = useRef("");
+  const [recipientSnapShot] = useCollection(
+    db.collection("users").where("email", "==", recipientEmail)
+  );
+  const recipient = recipientSnapShot?.docs.map((doc) => doc.data())?.[0];
+
+  const [messageSnapShot] = useCollection(
+    db
+      .collection("chats")
+      .doc(params.id)
+      .collection("messeges")
+      .orderBy("timestamp", "asc")
+  );
+
+  const scrollToBottom = () => {
+    endMessageRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   const submitChat = (e) => {
     e.preventDefault();
 
-    db.collection('chats').doc(params.id).collection('messeges').add({
+    db.collection("users").doc(user.uid).update({
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    db.collection("chats").doc(params.id).collection("messeges").add({
       message: input,
       user: user.email,
       photoURL: user.photoURL,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    } );
-    
-    setInput('');
-  }
+    });
+
+    setInput("");
+    scrollToBottom();
+  };
+
+  const showMessages = () => {
+    return messageSnapShot?.docs.map((message) => {
+      console.log(message.data());
+      return (
+        <Message
+          key={message.id}
+          user={message.data().user}
+          message={message.data()}
+        ></Message>
+      );
+    });
+  };
 
   return (
     <Container>
       <ChatHeader>
         <UserInfo>
-          <Avatar></Avatar>
+          {recipient?.photoURL ? (
+            <Avatar src={recipient?.photoURL}></Avatar>
+          ) : (
+            <Avatar>{recipientEmail[0]}</Avatar>
+          )}
           <UserName>
-            <h3>{user.email}</h3>
-            <p>Last Active: Unavailable</p>
+            <h3>{recipientEmail}</h3>
+            {recipient?.lastSeen ? (
+              <p>
+                Last Seen:
+                <TimeAgo datetime={recipient?.lastSeen.toDate()}></TimeAgo>
+              </p>
+            ) : (
+              <p>Last Seen: Unavailable</p>
+            )}
           </UserName>
         </UserInfo>
         <SideIcons>
@@ -49,13 +102,16 @@ function ChatContainer() {
       </ChatHeader>
 
       <MessageContainer>
-        <EndOfMessage></EndOfMessage>
+        {showMessages()}
+        <EndOfMessage ref={endMessageRef}></EndOfMessage>
       </MessageContainer>
 
       <InputContainer>
         <EmojiEmotionsIcon />
-        <Input value={input} onChange={e => setInput(e.target.value)}></Input>
-        <button type="submit" disabled={!input} onClick={submitChat}></button>
+        <Input value={input} onChange={(e) => setInput(e.target.value)} />
+        <button hidden type="submit" disabled={!input} onClick={submitChat}>
+          Send Message
+        </button>
         <MicIcon />
       </InputContainer>
     </Container>
@@ -99,14 +155,17 @@ const SideIcons = styled.div`
 `;
 
 const MessageContainer = styled.div`
-height: 90vh;
-background-color: #e5ded8;
-padding: 30px;
+  height: 90vh;
+  background-color: #e5ded8;
+  padding: 30px;
+  overflow: scroll;
+  z-index: 1;
 `;
 
-
-const EndOfMessage = styled.div``;
-const InputContainer = styled.div`
+const EndOfMessage = styled.div`
+  margin-bottom: 50px;
+`;
+const InputContainer = styled.form`
   display: flex;
   align-items: center;
   position: sticky;
@@ -116,8 +175,8 @@ const InputContainer = styled.div`
   z-index: 100;
 `;
 const Input = styled.input`
-  background-color: whitesmoke; 
-  padding: 20px;  
+  background-color: whitesmoke;
+  padding: 20px;
   border: none;
   border-radius: 10px;
   outline: 0;
