@@ -17,7 +17,6 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import getRecipientEmail from "@/utils/getRecipientEmail";
 
 function ChatContainer({ chat, messages }) {
-  console.log(JSON.parse(messages))
   const router = useRouter();
   const params = useParams();
   const [user] = useAuthState(auth);
@@ -113,7 +112,7 @@ function ChatContainer({ chat, messages }) {
         <button hidden type="submit" disabled={!input} onClick={submitChat}>
           Send Message
         </button>
-        <MicIcon />
+        <MicIcon /> 
       </InputContainer>
     </Container>
   );
