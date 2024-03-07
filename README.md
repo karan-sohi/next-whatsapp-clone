@@ -8,4 +8,8 @@ Technologies Used - React, NextJS, Firebase and TailWindCSS.
 
 Authentication - The users can sign-in through Google and all the users data is stored in Firebase Firestore. 
 
+- Login and Registration (Using Google Firebase Authentication)
+- Add more friends by adding their emails
+- The timestamp is displayed on every message 
+- User can see the when his friend was last online
 
